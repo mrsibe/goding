@@ -1,10 +1,15 @@
 # goding
 
+[![CI](https://github.com/mrsibe/goding/actions/workflows/ci.yml/badge.svg)](https://github.com/mrsibe/goding/actions/workflows/ci.yml)
+[![Release](https://github.com/mrsibe/goding/actions/workflows/release.yml/badge.svg)](https://github.com/mrsibe/goding/actions/workflows/release.yml)
+
 Headless coding agent built on the
 [GOAT](https://github.com/mrsibe/goat) SDK.
 
 This repository contains the former `coding`, `codingagent`, and `cmd/goding`
-packages. It depends on `github.com/mrsibe/goat v0.4.0`.
+packages. It depends on `github.com/mrsibe/goat v0.4.1`.
+
+The current CLI version is `v0.2.1`.
 
 ## Build
 
@@ -24,6 +29,10 @@ export OPENAI_BASE_URL=https://api.deepseek.com
 
 没有消息参数且 stdin 是管道时，goding 会从 stdin 读取提示词。`--json`
 每行输出一个 Agent 事件；`--no-session` 关闭 JSONL 会话持久化。
+
+`--json` 输出轻量的扁平事件流。GOAT 的 `message_update` 事件会携带完整的
+partial message，因此 goding 在 JSON 模式下会过滤该事件，避免重复输出和
+体积膨胀。
 
 ## Security
 

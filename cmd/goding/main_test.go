@@ -52,6 +52,25 @@ func TestRunJSONModeAndStdin(t *testing.T) {
 	if len(lines) < 3 {
 		t.Fatalf("json lines = %v", lines)
 	}
+	var sawMessageDelta, sawMessageUpdate bool
+	for _, line := range lines {
+		var event map[string]any
+		if err := json.Unmarshal([]byte(line), &event); err != nil {
+			t.Fatal(err)
+		}
+		switch event["type"] {
+		case "message_delta":
+			sawMessageDelta = true
+		case "message_update":
+			sawMessageUpdate = true
+		}
+	}
+	if !sawMessageDelta {
+		t.Fatalf("json lines missing message_delta: %v", lines)
+	}
+	if sawMessageUpdate {
+		t.Fatalf("json lines unexpectedly include message_update: %v", lines)
+	}
 	var first, last map[string]any
 	if err := json.Unmarshal([]byte(lines[0]), &first); err != nil {
 		t.Fatal(err)
@@ -173,7 +192,7 @@ func TestRunExitCodesAndValidation(t *testing.T) {
 	stdout.Reset()
 	stderr.Reset()
 	code = run([]string{"--version"}, strings.NewReader(""), true, &stdout, &stderr, nil)
-	if code != 0 || !strings.Contains(stdout.String(), "goding ") {
+	if code != 0 || strings.TrimSpace(stdout.String()) != "goding 0.2.1" {
 		t.Fatalf("version: code=%d stdout=%q", code, stdout.String())
 	}
 }

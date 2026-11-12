@@ -19,7 +19,7 @@ import (
 	"github.com/mrsibe/goding/codingagent"
 )
 
-const version = "0.2.0"
+const version = "0.2.1"
 
 type options struct {
 	model       string
@@ -152,7 +152,7 @@ func run(args []string, stdin io.Reader, stdinIsTerminal bool, stdout, stderr io
 		}
 	}
 	onEvent := func(event agent.Event) {
-		if !opts.json || encodeErr != nil {
+		if !opts.json || encodeErr != nil || event.Type == agent.EventMessageUpdate {
 			return
 		}
 		if err := encoder.Encode(event); err != nil {
