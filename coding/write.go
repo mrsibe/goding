@@ -20,8 +20,8 @@ type writeTool struct {
 	workspace string
 }
 
-func (t *writeTool) Spec() ai.ToolSpec {
-	return ai.ToolSpec{
+func (t *writeTool) Spec() agent.ToolSpec {
+	return agent.ToolSpec{
 		Name:        "write",
 		Description: "Write content to a file. Creates the file if it does not exist, overwrites it if it does, and creates parent directories.",
 		Parameters: objectSchema(map[string]any{

@@ -30,7 +30,7 @@ type Config struct {
 // Agent composes a generic agent with coding tools and optional JSONL
 // session persistence.
 type Agent struct {
-	core      *agent.Agent
+	config    agent.Config
 	workspace string
 	store     *sessionStore
 }
@@ -49,13 +49,13 @@ func New(config Config) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
-	core, err := agent.New(agent.Config{
+	coreConfig := agent.Config{
 		Model:        config.Model,
 		Tools:        tools,
 		SystemPrompt: coding.BuildSystemPrompt(workspace, instructions),
 		MaxSteps:     config.MaxSteps,
-	})
-	if err != nil {
+	}
+	if _, err := agent.New(coreConfig); err != nil {
 		return nil, err
 	}
 	var store *sessionStore
@@ -65,7 +65,7 @@ func New(config Config) (*Agent, error) {
 			return nil, err
 		}
 	}
-	return &Agent{core: core, workspace: workspace, store: store}, nil
+	return &Agent{config: coreConfig, workspace: workspace, store: store}, nil
 }
 
 // NewSession creates a conversation. The JSONL file is created lazily when the
@@ -131,9 +131,15 @@ func (a *Agent) newSession(history []ai.Message, path string, header *sessionHea
 			return nil, err
 		}
 	}
+	coreConfig := a.config
+	coreConfig.Messages = history
+	core, err := agent.New(coreConfig)
+	if err != nil {
+		return nil, err
+	}
 	return &Session{
 		id:        id,
-		core:      a.core.NewSessionWithHistory(history),
+		core:      core,
 		store:     a.store,
 		workspace: a.workspace,
 		path:      path,
@@ -145,7 +151,7 @@ func (a *Agent) newSession(history []ai.Message, path string, header *sessionHea
 // Session is one resumable goding conversation.
 type Session struct {
 	id        string
-	core      *agent.Session
+	core      *agent.Agent
 	store     *sessionStore
 	workspace string
 	path      string
@@ -189,7 +195,9 @@ func (s *Session) Run(ctx context.Context, input string, onEvent func(agent.Even
 			}
 		}
 	}
-	result, runErr := s.core.Run(ctx, input, agent.WithOnEvent(handler))
+	unsubscribe := s.core.Subscribe(handler)
+	defer unsubscribe()
+	result, runErr := s.core.Prompt(ctx, input)
 	if result.Usage != (ai.Usage{}) {
 		if err := s.appendUsage(result.Usage); err != nil {
 			s.mu.Lock()

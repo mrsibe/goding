@@ -23,8 +23,8 @@ type readTool struct {
 	workspace string
 }
 
-func (t *readTool) Spec() ai.ToolSpec {
-	return ai.ToolSpec{
+func (t *readTool) Spec() agent.ToolSpec {
+	return agent.ToolSpec{
 		Name:        "read",
 		Description: "Read the contents of a text file. Output is truncated to 2000 lines or 50KB, whichever is hit first. Use offset/limit for large files.",
 		Parameters: objectSchema(map[string]any{

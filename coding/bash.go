@@ -23,8 +23,8 @@ type bashTool struct {
 	workspace string
 }
 
-func (t *bashTool) Spec() ai.ToolSpec {
-	return ai.ToolSpec{
+func (t *bashTool) Spec() agent.ToolSpec {
+	return agent.ToolSpec{
 		Name:        "bash",
 		Description: "Execute a bash command in the workspace. Returns combined stdout and stderr, truncated to the last 2000 lines or 50KB. If truncated, the full output is saved to a temp file.",
 		Parameters: objectSchema(map[string]any{

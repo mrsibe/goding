@@ -26,8 +26,8 @@ type editTool struct {
 	workspace string
 }
 
-func (t *editTool) Spec() ai.ToolSpec {
-	return ai.ToolSpec{
+func (t *editTool) Spec() agent.ToolSpec {
+	return agent.ToolSpec{
 		Name:        "edit",
 		Description: "Edit one file using exact text replacement. Every edits[].oldText must match a unique, non-overlapping region of the original file.",
 		Parameters: objectSchema(map[string]any{

@@ -4,7 +4,7 @@ Headless coding agent built on the
 [GOAT](https://github.com/mrsibe/goat) SDK.
 
 This repository contains the former `coding`, `codingagent`, and `cmd/goding`
-packages. It depends on `github.com/mrsibe/goat v0.2.0`.
+packages. It depends on `github.com/mrsibe/goat v0.4.0`.
 
 ## Build
 
